@@ -25,32 +25,44 @@ routes.get('/', async (req, res)=>{
 routes.get('/new', (req, res)=>{
     res.render('campgrounds/new');
 })
-//    if (!req.body.campground) throw new Error('No campground submitted');
+
 routes.post('/', validationCamp,catchAsync(async (req, res) => {
+    //    if (!req.body.campground) throw new Error('No campground submitted');
     const newcamp = new CampGround(req.body.campground);
     await newcamp.save();
+    req.flash('success', 'You have successfully created a new CampGround')
     res.redirect(`/campgrounds/${newcamp._id}`);
 }));
 
 routes.get('/:id',catchAsync(async (req, res)=>{
     const campground = await CampGround.findById(req.params.id).populate('reviews')
+    if(!campground){
+        req.flash('error', 'campground not found')
+        return res.redirect('/campgrounds')
+    }
     res.render('campgrounds/show', {campground});
 }))
 
 routes.get('/:id/edit',catchAsync(async (req, res)=>{
     const campground = await CampGround.findById(req.params.id);
+    if(!campground){
+        req.flash('error', 'campground not found')
+        return res.redirect('/campgrounds')
+    }
     res.render('campgrounds/edit', { campground });
 }))
 
 routes.put('/:id', validationCamp, catchAsync(async(req,res)=>{
     const { id } = req.params;
     const campground =await CampGround.findByIdAndUpdate(id, {...req.body.campground})
+    req.flash('success', 'You have successfully udated the CampGround')
     res.redirect(`/campgrounds/${campground._id}`)
 }))
 
 routes.delete('/:id', catchAsync(async (req,res)=>{
     const { id } = req.params;
     await CampGround.findByIdAndDelete(id);
+    req.flash('success', 'You have successfully Deleted the CampGround')
     res.redirect('/campgrounds');
 }))
 
