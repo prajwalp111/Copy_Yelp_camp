@@ -6,11 +6,17 @@ const ejsMate = require('ejs-mate')
 const methodOverride = require('method-override')
 const ExpressError = require('./utils/ExpressError')
 //routes
-const campgrounds = require('./routes/campgrounds')
-const review = require('./routes/reviews')
+const userRoutes = require('./routes/user')
+const campgroundRoutes = require('./routes/campgrounds')
+const reviewRoutes = require('./routes/reviews')
 
 const session = require('express-session')
 const flash = require('connect-flash')
+
+const User = require('./models/user')
+
+const passport = require('passport')
+const LocalStatergy = require('passport-local')
 
 const sessionConfig = {
     secret : 'thisisaverydangerousplace',
@@ -23,8 +29,6 @@ const sessionConfig = {
 
     }
 } 
-app.use(session(sessionConfig))
-
 
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp');
 
@@ -38,6 +42,15 @@ app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')))
 //app.use(express.static('public'))
+
+app.use(session(sessionConfig))
+
+app.use(passport.initialize())
+app.use(passport.session())
+passport.use(new LocalStatergy(User.authenticate()))
+
+passport.serializeUser(User.serializeUser())             //how to store user info
+passport.deserializeUser(User.deserializeUser())         //how to extract user info
 
 const db = mongoose.connection;
 db.on("error",console.error.bind(console,"connection error:"));
@@ -57,9 +70,9 @@ app.use((req, res, next)=>{
     next();
 })
 
-app.use('/campgrounds', campgrounds)
-
-app.use('/campgrounds/:id/reviews', review)
+app.use('/', userRoutes)
+app.use('/campgrounds', campgroundRoutes)
+app.use('/campgrounds/:id/reviews', reviewRoutes)
 
 app.all(/(.*)/,(req, res, next)=>{
     next(new ExpressError('NOT FOUND', 404))
