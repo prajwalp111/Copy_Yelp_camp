@@ -16,7 +16,7 @@ const flash = require('connect-flash')
 const User = require('./models/user')
 
 const passport = require('passport')
-const LocalStatergy = require('passport-local')
+const LocalStrategy = require('passport-local')
 
 const sessionConfig = {
     secret : 'thisisaverydangerousplace',
@@ -47,7 +47,7 @@ app.use(session(sessionConfig))
 
 app.use(passport.initialize())
 app.use(passport.session())
-passport.use(new LocalStatergy(User.authenticate()))
+passport.use(new LocalStrategy(User.authenticate()))
 
 passport.serializeUser(User.serializeUser())             //how to store user info
 passport.deserializeUser(User.deserializeUser())         //how to extract user info
@@ -65,6 +65,7 @@ app.get('/', (req, res)=>{
 app.use(flash());
 
 app.use((req, res, next)=>{
+    res.locals.currentUser = req.user
     res.locals.success = req.flash('success')
     res.locals.error = req.flash('error')
     next();

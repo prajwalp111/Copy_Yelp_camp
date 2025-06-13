@@ -7,6 +7,8 @@ const catchAsync = require('../utils/catchAsync')
 const { campgroundSchema } = require('../schemas.js')
 const CampGround = require('../models/campGround')
 
+const { isLoggedin } = require('../middleware.js')
+
 const validationCamp = (req, res, next)=>{
      const { error } = campgroundSchema.validate(req.body);
     if (error) {
@@ -22,11 +24,11 @@ routes.get('/', async (req, res)=>{
     res.render('campgrounds/index',{campgrounds});
 })
 
-routes.get('/new', (req, res)=>{
+routes.get('/new', isLoggedin, (req, res)=>{
     res.render('campgrounds/new');
 })
 
-routes.post('/', validationCamp,catchAsync(async (req, res) => {
+routes.post('/', isLoggedin, validationCamp,catchAsync(async (req, res) => {
     //    if (!req.body.campground) throw new Error('No campground submitted');
     const newcamp = new CampGround(req.body.campground);
     await newcamp.save();
@@ -34,7 +36,7 @@ routes.post('/', validationCamp,catchAsync(async (req, res) => {
     res.redirect(`/campgrounds/${newcamp._id}`);
 }));
 
-routes.get('/:id',catchAsync(async (req, res)=>{
+routes.get('/:id',  catchAsync(async (req, res)=>{
     const campground = await CampGround.findById(req.params.id).populate('reviews')
     if(!campground){
         req.flash('error', 'campground not found')
@@ -43,7 +45,7 @@ routes.get('/:id',catchAsync(async (req, res)=>{
     res.render('campgrounds/show', {campground});
 }))
 
-routes.get('/:id/edit',catchAsync(async (req, res)=>{
+routes.get('/:id/edit', isLoggedin,catchAsync(async (req, res)=>{
     const campground = await CampGround.findById(req.params.id);
     if(!campground){
         req.flash('error', 'campground not found')
@@ -52,14 +54,14 @@ routes.get('/:id/edit',catchAsync(async (req, res)=>{
     res.render('campgrounds/edit', { campground });
 }))
 
-routes.put('/:id', validationCamp, catchAsync(async(req,res)=>{
+routes.put('/:id', isLoggedin, validationCamp, catchAsync(async(req,res)=>{
     const { id } = req.params;
     const campground =await CampGround.findByIdAndUpdate(id, {...req.body.campground})
     req.flash('success', 'You have successfully udated the CampGround')
     res.redirect(`/campgrounds/${campground._id}`)
 }))
 
-routes.delete('/:id', catchAsync(async (req,res)=>{
+routes.delete('/:id', isLoggedin, catchAsync(async (req,res)=>{
     const { id } = req.params;
     await CampGround.findByIdAndDelete(id);
     req.flash('success', 'You have successfully Deleted the CampGround')
