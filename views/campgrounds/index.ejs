@@ -1,13 +1,23 @@
 <% layout('layouts/boilerplate') %>
     
+    <div id="cluster-map" ></div>
+
+
+
     <h1>All Camp Grounds</h1>
     <% for (let campground of campgrounds) {%>
     
-        <div class="card mn-3">
+        <div class="card mb-3">
             <div class="row">
+                <% if(campground.images.lenth){ %>
                 <div class="col-md-4">
                     <img class="img-fluid" src="<%= campground.images[0].url %>" alt="">
                 </div>
+                <% }else{ %>
+                    <div class="col-md-4">
+                    <img class="img-fluid" src="https://img.freepik.com/free-photo/morskie-oko-tatry_1204-510.jpg?semt=ais_hybrid&w=740" alt="">
+                </div>
+                <% } %>
                 <div class="col-md-8">
                     <div class="card-body">
                         <h5 class="card-title"><%= campground.title %></h5>
@@ -26,3 +36,11 @@
         </div>
 
     <% } %>
+
+
+<script>
+    const mapTocken = '<%- process.env.MAPTILER_KEY %>'; 
+    const campgrounds = {features : <%- JSON.stringify(campgrounds) %>}
+</script>
+
+<script src="/javascripts/clusterMap.js"></script>

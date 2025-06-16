@@ -41,13 +41,16 @@ app.engine('ejs',ejsMate);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(express.urlencoded({ extended: true }));
+
 app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')))
 //app.use(express.static('public'))
 
 app.use(session(sessionConfig))
+
+
+app.use(flash());
 
 app.use(passport.initialize())
 app.use(passport.session())
@@ -62,11 +65,9 @@ db.once('open',()=>{
     console.log('Database connection established');
 });
 
-app.get('/', (req, res)=>{
-    res.render('home');
-})
 
-app.use(flash());
+
+
 
 app.use((req, res, next)=>{
     res.locals.currentUser = req.user
@@ -78,6 +79,9 @@ app.use((req, res, next)=>{
 app.use('/', userRoutes)
 app.use('/campgrounds', campgroundRoutes)
 app.use('/campgrounds/:id/reviews', reviewRoutes)
+app.get('/', (req, res)=>{
+    res.render('home');
+})
 
 app.all(/(.*)/,(req, res, next)=>{
     next(new ExpressError('NOT FOUND', 404))
@@ -88,6 +92,8 @@ app.use((err, req, res, next)=>{
     if(!err.message) err.message = 'somrthing went wrong..... e..r...r...o...r...';
     res.status(statusCode).render('error',{ err });    
 })
+
+
 
 app.listen(5050,()=>{
     console.log('Connection opened at port 5050')

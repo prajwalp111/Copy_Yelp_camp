@@ -1,4 +1,8 @@
 const CampGround = require('../models/campGround')
+const mapTGeocoding = require('@maptiler/client')
+const { cloudinary } = require('../cloudinary')
+
+mapTGeocoding.config.apiKey = process.env.MAPTILER_KEY;
 
 module.exports.index = async (req, res)=>{
     const campgrounds = await CampGround.find({});
@@ -11,10 +15,17 @@ module.exports.renderNewForm = (req, res)=>{
 
 module.exports.makeNewForm = async (req, res) => {
     //    if (!req.body.campground) throw new Error('No campground submitted');
+
+    const result = await mapTGeocoding.geocoding.forward(req.body.campground.location,{
+        limit: 1
+    });
+    
     const newcamp = new CampGround(req.body.campground);
+    newcamp.geometry = result.features[0].geometry;
     newcamp.images = req.files.map(f => ({ url:f.path , filename:f.filename}))
     newcamp.author = req.user._id
     await newcamp.save();
+    //console.log(req.body.newcamp.geometry)
     console.log(newcamp)
     req.flash('success', 'You have successfully created a new CampGround')
     res.redirect(`/campgrounds/${newcamp._id}`);
@@ -51,6 +62,12 @@ module.exports.updateCampgrounds = async(req,res)=>{
     const img = req.files.map(f => ({ url:f.path , filename:f.filename}))
     campground.images.push(...img)
     await campground.save()
+    if(req.body.deleteImages){
+        for(let filename of req.body.deleteImages){
+            cloudinary.uploader.destroy(filename)
+        }
+        await campground.updateOne({$pull:{images:{filename:{$in:req.body.deleteImages}}}})
+    }
     req.flash('success', 'You have successfully udated the CampGround')
     res.redirect(`/campgrounds/${campground._id}`)
 }
