@@ -12,8 +12,10 @@ module.exports.renderNewForm = (req, res)=>{
 module.exports.makeNewForm = async (req, res) => {
     //    if (!req.body.campground) throw new Error('No campground submitted');
     const newcamp = new CampGround(req.body.campground);
+    newcamp.images = req.files.map(f => ({ url:f.path , filename:f.filename}))
     newcamp.author = req.user._id
     await newcamp.save();
+    console.log(newcamp)
     req.flash('success', 'You have successfully created a new CampGround')
     res.redirect(`/campgrounds/${newcamp._id}`);
 }
@@ -44,7 +46,11 @@ module.exports.renderEditForm = async (req, res)=>{
 
 module.exports.updateCampgrounds = async(req,res)=>{
     const { id } = req.params
+    console.log(req.body)
     const campground =await CampGround.findByIdAndUpdate(id, {...req.body.campground})
+    const img = req.files.map(f => ({ url:f.path , filename:f.filename}))
+    campground.images.push(...img)
+    await campground.save()
     req.flash('success', 'You have successfully udated the CampGround')
     res.redirect(`/campgrounds/${campground._id}`)
 }
