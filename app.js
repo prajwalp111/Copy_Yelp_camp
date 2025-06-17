@@ -24,11 +24,28 @@ const passport = require('passport')
 const LocalStrategy = require('passport-local')
 
 const helmet = require('helmet')
+const MongoStore = require('connect-mongo')
+
+/////////////
+const DB_URL =process.env.DB_URL;
+////////////
 
 const sanitizeV5 = require('./utils/mongoSanitizeV5.js');
 app.set('query parser', 'extended');
 
+const store = MongoStore.create({
+    mongoUrl: DB_URL,
+    touchAfter: 24 * 60 * 60,
+    crypto: {
+        secret: 'thisshouldbeabettersecret!'
+    }
+});
+store.on("error", function(e){
+    console.log("session store error ")
+})
+
 const sessionConfig = {
+    store,
     name : 'session',
     secret : 'thisisaverydangerousplace',
     resave : false,
@@ -42,7 +59,7 @@ const sessionConfig = {
     }
 } 
 
-mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp');
+mongoose.connect(DB_URL);
 
 app.use(express.urlencoded({ extended: true }));
 app.engine('ejs',ejsMate);
