@@ -30,6 +30,8 @@ const MongoStore = require('connect-mongo')
 const DB_URL =process.env.DB_URL;
 ////////////
 
+const secret =process.env.SECRET;
+
 const sanitizeV5 = require('./utils/mongoSanitizeV5.js');
 app.set('query parser', 'extended');
 
@@ -47,7 +49,7 @@ store.on("error", function(e){
 const sessionConfig = {
     store,
     name : 'session',
-    secret : 'thisisaverydangerousplace',
+    secret,
     resave : false,
     saveUninitialized : true,
     cookie : {
