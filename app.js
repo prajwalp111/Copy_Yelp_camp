@@ -39,7 +39,7 @@ const store = MongoStore.create({
     mongoUrl: DB_URL,
     touchAfter: 24 * 60 * 60,
     crypto: {
-        secret
+        secret : 'thisisaverydangerousplace',
     }
 });
 store.on("error", function(e){
