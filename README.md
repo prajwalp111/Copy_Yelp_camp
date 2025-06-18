@@ -72,8 +72,7 @@ ExploreHut/
 
 ## 📸 Screenshots
 
-![Home Page](https://drive.google.com/file/d/1MGm0ox3m0kz-JS7TQ7uDWYEfJ1Lyp7GB/view?usp=sharing)
-![Campground Show Page](https://drive.google.com/file/d/1MGm0ox3m0kz-JS7TQ7uDWYEfJ1Lyp7GB/view?usp=sharing)
+![Home Page](https://raw.githubusercontent.com/prajwalp111/Copy_Yelp_camp/main/frontpage.png)
+![Campground Show Page](https://raw.githubusercontent.com/prajwalp111/Copy_Yelp_camp/main/showpage.png)
 
-
-> Created  Prajwal P and Team
+> Created  Prajwal P 
