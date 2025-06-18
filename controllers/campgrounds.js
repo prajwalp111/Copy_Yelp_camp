@@ -25,8 +25,7 @@ module.exports.makeNewForm = async (req, res) => {
     newcamp.images = req.files.map(f => ({ url:f.path , filename:f.filename}))
     newcamp.author = req.user._id
     await newcamp.save();
-    console.log(req.body.newcamp)
-    console.log(newcamp)
+
     req.flash('success', 'You have successfully created a new CampGround')
     res.redirect(`/campgrounds/${newcamp._id}`);
 }
