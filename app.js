@@ -27,7 +27,7 @@ const helmet = require('helmet')
 const MongoStore = require('connect-mongo')
 
 /////////////
-const DB_URL = 'mongodb://127.0.0.1:27017/yelp-camp' //process.env.DB_URL;
+const DB_URL = process.env.DB_URL;
 ////////////
 
 const secret =process.env.SECRET;
