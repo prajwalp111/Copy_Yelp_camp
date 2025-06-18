@@ -27,7 +27,7 @@ const helmet = require('helmet')
 const MongoStore = require('connect-mongo')
 
 /////////////
-const DB_URL =process.env.DB_URL;
+const DB_URL = 'mongodb://127.0.0.1:27017/yelp-camp' //process.env.DB_URL;
 ////////////
 
 const secret =process.env.SECRET;
@@ -39,7 +39,7 @@ const store = MongoStore.create({
     mongoUrl: DB_URL,
     touchAfter: 24 * 60 * 60,
     crypto: {
-        secret: 'thisshouldbeabettersecret!'
+        secret
     }
 });
 store.on("error", function(e){
@@ -130,7 +130,6 @@ app.use(
 );
 
 
-
 app.use(flash());
 
 app.use(passport.initialize())
@@ -145,9 +144,6 @@ db.on("error",console.error.bind(console,"connection error:"));
 db.once('open',()=>{
     console.log('Database connection established');
 });
-
-
-
 
 
 app.use((req, res, next)=>{
